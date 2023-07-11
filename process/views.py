@@ -38,22 +38,6 @@ def deleteProcess(request):
         return HttpResponseBadRequest('Server error occurred')
 
 
-def generateNumbers(request):
-    startingSNo = (10**6)*random.randint(10**5, 10**6-1)
-    if ProcessData.objects.all().filter(startingSNo__exact=startingSNo).exists():
-        return generateNumbers(request)
-    try:
-        currentProcessNos = []
-        for e in ProcessData.objects.all():
-            currentProcessNos.append(e.processNo)
-        processNo = max(currentProcessNos) + 1
-    except ProcessData.DoesNotExist:
-        processNo = 10000
-    except ValueError:
-        processNo = 10000
-    return JsonResponse({'startingSNo': (10**6)*random.randint(10**6, 10**7-1), 'processNo': processNo})
-
-
 def getStageQuantity(request):
     data = json.loads(request.body)
     try:

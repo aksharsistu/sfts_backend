@@ -78,14 +78,25 @@ WSGI_APPLICATION = 'sfts_temp.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'test',
+#         'USER': 'synegra-barcode2',
+#         'PASSWORD': 'Synegra@123',
+#         'HOST': '192.168.25.248',
+#         'PORT': '3306',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'test',
-        'USER': 'synegra-barcode2',
-        'PASSWORD': 'Synegra@123',
-        'HOST': '192.168.25.248',
-        'PORT': '3306',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'db.sqlite3',
+        # 'USER': '',
+        # 'PASSWORD': '',
+        # 'HOST': '',
+        # 'PORT': '',
     }
 }
 
