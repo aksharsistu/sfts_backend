@@ -17,5 +17,5 @@ class Barcode(models.Model):
 
 
 class Permanent(models.Model):
-    barcode = models.CharField(max_length=12)
+    barcode = models.CharField(max_length=12, primary_key=True)
     permanent = models.CharField(max_length=13)
