@@ -46,3 +46,5 @@ def getStageQuantity(request):
         return HttpResponse(q.quantity)
     except Quantity.DoesNotExist:
         return HttpResponseBadRequest('No product found')
+    except ValueError:
+        return HttpResponse('Please choose a process number')

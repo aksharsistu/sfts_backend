@@ -55,7 +55,7 @@ def log(request):
     if len(data['description']) == 13:
         q = Permanent(barcode=data['barcode'], permanent=data['description'])
         q.save()
-        return HttpResponse('Successfully Linked' + data['barcode'] + ' / ' + data['description'])
+        return HttpResponse('Successfully Linked: ' + data['barcode'] + ' / ' + data['description'])
 
     return HttpResponse('Successfully scanned: ' + data['barcode'])
 
