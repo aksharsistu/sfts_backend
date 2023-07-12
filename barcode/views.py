@@ -22,6 +22,7 @@ def log(request):
     if check_multiple_scans(data):
         return HttpResponse('Multiple scans detected at the same stage/place')
 
+    qa_check(data)
     # Update Quantity:
     try:
         # Stage wise quantities in the Quantity Model:
@@ -95,8 +96,10 @@ def check_place(data):
 
 
 def check_multiple_scans(data):
-    return Barcode.objects.all().filter(barcode__exact=data['barcode']).filter(stageName_id__exact=data['stageName'])\
-        .filter(placeName__exact=data['placeName']).exists() and not data['override']
+    if data['placeName'] == 'start':
+        return Barcode.objects.all().filter(barcode__exact=data['barcode'])\
+            .filter(stageName_id__exact=data['stageName']).exists()
+    return False
 
 
 def check_previous_stages(data):
@@ -114,4 +117,21 @@ def check_previous_stages(data):
         if not Barcode.objects.all().filter(barcode__exact=data['barcode']).filter(stageName_id__exact=arr[i])\
                 .filter(productName_id__exact=data['productName']).filter(placeName__exact=last_stage).exists():
             return arr[i] + '-' + last_stage
+        if Barcode.objects.get(barcode__exact=data['barcode'], stageName_id=arr[i], productName_id=data['productName'],
+                               placeName__exact=last_stage).description:
+            return 'QA not cleared'
     return 0
+
+
+def qa_check(data):
+    if data['placeName'] == 'qa':
+        if data['override']:
+            pass
+            # A routine which will create entries for all the barcodes in the range and set their description
+            # to the same reject code as the sample tested.
+        else:
+            pass
+            '''
+            Check if stage quantity is 5. Once it is 5 just create entries for all the products in the range
+            and set blank descriptions for them showing that they passed the test.
+            '''
