@@ -92,6 +92,9 @@ def check_place(data):
     if data['placeName'] != "start" and not Barcode.objects.all().filter(barcode__exact=data['barcode'])\
             .filter(stageName_id__exact=data['stageName']).filter(placeName__exact="start").exists():
         return True
+    # if data['placeName'] == 'qa' and not Barcode.objects.all().filter(barcode__exact=data['barcode']) \
+    #         .filter(stageName_id__exact=data['stageName']).filter(placeName__exact="end").exists():
+    #     return True
     return False
 
 
@@ -117,8 +120,9 @@ def check_previous_stages(data):
         if not Barcode.objects.all().filter(barcode__exact=data['barcode']).filter(stageName_id__exact=arr[i])\
                 .filter(productName_id__exact=data['productName']).filter(placeName__exact=last_stage).exists():
             return arr[i] + '-' + last_stage
-        if Barcode.objects.get(barcode__exact=data['barcode'], stageName_id=arr[i], productName_id=data['productName'],
-                               placeName__exact=last_stage).description:
+        if not Barcode.objects.all().filter(barcode__exact=data['barcode'], stageName_id=arr[i],
+                                            productName_id=data['productName'], processNo_id=data['processNo'],
+                                            placeName__exact=last_stage, description='').exists():
             return 'QA not cleared'
     return 0
 
@@ -126,12 +130,27 @@ def check_previous_stages(data):
 def qa_check(data):
     if data['placeName'] == 'qa':
         if data['override']:
-            pass
-            # A routine which will create entries for all the barcodes in the range and set their description
-            # to the same reject code as the sample tested.
-        else:
-            pass
-            '''
-            Check if stage quantity is 5. Once it is 5 just create entries for all the products in the range
-            and set blank descriptions for them showing that they passed the test.
-            '''
+            for e in range(int(ProcessData.objects.get(processNo=data['processNo']).startingSNo),
+                           int(ProcessData.objects.get(processNo=data['processNo']).endingSNo)):
+                if Barcode.objects.all().filter(barcode__exact=e) \
+                        .filter(stageName_id__exact=data['stageName']).filter(placeName__exact="start").exists():
+                    q = Barcode(barcode=e, description=data['description'], processNo_id=data['processNo'],
+                                productName_id=data['productName'], stageName_id=data['stageName'],
+                                placeName=data['placeName'],
+                                username_id=data['username'], timestamp=timezone.now())
+                    q.save()
+            return
+
+        if Quantity.objects.get(processNo_id=data['processNo'], stageName_id=data['stageName']).quantity == 5:
+            for e in range(int(ProcessData.objects.get(processNo=data['processNo']).startingSNo),
+                           int(ProcessData.objects.get(processNo=data['processNo']).endingSNo)):
+                if Barcode.objects.all().filter(barcode__exact=e) \
+                        .filter(stageName_id__exact=data['stageName']).filter(placeName__exact="start").exists():
+                    q = Barcode(barcode=e, description='', processNo_id=data['processNo'],
+                                productName_id=data['productName'], stageName_id=data['stageName'],
+                                placeName=data['placeName'],
+                                username_id=data['username'], timestamp=timezone.now())
+                    q.save()
+            return
+        return
+    return
